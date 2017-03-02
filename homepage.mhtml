@@ -1,0 +1,554 @@
+From: <Saved by Blink>
+Subject: The "3DM" XML 3-way Merging and Differencing Tool
+Date: Fri, 2 Mar 2017 12:46:38 -0000
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--5ks6krb1iPqsSVOURlKXvJw2pPgRQOXxvWK07fY8wB----"
+
+------MultipartBoundary--5ks6krb1iPqsSVOURlKXvJw2pPgRQOXxvWK07fY8wB----
+Content-Type: text/html
+Content-ID: <frame-1532-9612bbf6-c968-45d2-abd4-f1924918a14e@mhtml.blink>
+Content-Transfer-Encoding: quoted-printable
+Content-Location: https://www.cs.hut.fi/~ctl/3dm/
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"><html><head>=
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dwindows-1=
+252">
+                                      =20
+  <meta name=3D"author" content=3D"ctl">
+  <title>The "3DM" XML 3-way Merging and Differencing Tool</title>
+</head>
+  <body>
+=20
+<h1>The "3DM" XML 3-way Merging and Differencing Tool&nbsp;</h1>
+<i>Keywords: tree, diff, differencing, merge, merging, 3-way, XML,
+treediff, xmldiff</i>=20
+
+<h2>0. Recent Developemnt</h2>=20
+
+Please go to the <a href=3D"http://tdm.berlios.de/">3dm home page</a> for
+a more up-to-date version of the home page and 3dm itself. The
+information on this page is becoming increasingly obsolete.=20
+
+<h2>1. What is 3DM?</h2>
+          The 3DM tool is a tool for performing 3-way merging and differenc=
+ing
+   of  XML files. Unlike line-based tools, such as <tt>diff</tt> and <tt>
+diff3</tt>, 3DM is aware of the structure of the processed XML documents.
+3DM   is  not  limited to update/insert/delete operations, it also handles
+<b>  moves</b>       and <b>copies</b> of entire subtrees. 3DM is not
+reliant  on edit   histories;  the only input needed are the XML files. The
+tool was  implemented   as a part  of my master's thesis=20
+(<a href=3D"https://www.cs.hut.fi/~ctl/3dm/thesis.pdf">2.0M pdf, updated 26=
+/12/2001</a>,
+<a href=3D"https://www.cs.hut.fi/~ctl/3dm/thesis.ps.gz">3.9M .ps.gz, update=
+d 26/12/2001</a><sup>1</sup>)
+          , which is the currently recommended reading for those interested=
+=20
+ in  detailed   examples (chapter 2 and 10) and the algorithms (chapters 5-=
+9).<br>
+          These web pages will probably be updated to be more extensive if
+ enough    interest for the tool arises :)<br>
+=20
+<h2>2. An XML differencing example</h2>
+          Consider the two XML files (merge case A16 in the thesis):<br>
+ <br>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" bgcolor=3D"#ffff99"=
+>
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><b>b.xml</b><br>
+       </td>
+       <td valign=3D"Top"><b>2.xml</b><br>
+       </td>
+     </tr>
+     <tr>
+       <td valign=3D"Top"><tt>&lt;R&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;a&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;b/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;m/&gt;</tt><sup>5</sup><=
+tt><br>
+         &nbsp;&nbsp;&nbsp; &lt;/a&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;</tt><sup>3</sup><tt><br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &lt;/R&gt;</tt></td>
+       <td valign=3D"Top"><tt>&lt;R&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;m/&gt;<br>
+         &lt;/R&gt;</tt></td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+ <br>
+    The numbers are node identifiers, assigned according to the BFS travers=
+al
+  of the XML&nbsp; parse tree. They are not part of the XML file. The diffe=
+rence
+  is obtained by running:<br>
+ <br>
+ <tt>3dm --diff b.xml 1.xml</tt><br>
+ <br>
+         And looks like this:<br>
+ <br>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" width=3D"400" bgcol=
+or=3D"#ffff99">
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><tt>&lt;?xml version=3D"1.0" encoding=3D"UTF-8"?&=
+gt;<br>
+       &lt;diff&gt;<br>
+       &nbsp;&lt;diff:copy src=3D"3" dst=3D"1" /&gt;<br>
+       &nbsp;&lt;diff:copy src=3D"3" dst=3D"1" /&gt;<br>
+       &nbsp;&lt;diff:copy src=3D"5" dst=3D"1" /&gt;<br>
+       &lt;/diff&gt;<br>
+       </tt></td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+ <br>
+    The <tt>src</tt> attribute refers to nodes in <tt>b.xml</tt> by their=
+=20
+node  identifier. &nbsp;The diff says that <tt>2.xml</tt> is formed by sett=
+ing
+ the children of <tt>&lt;R&gt;</tt> to the subtrees rooted at node 3 (twice=
+)
+ and node 5 from <tt>b.xml</tt>. The differencing algorithm and the format
+ of the diff is described in chapter 8 of the thesis. <br>
+=20
+<h2>3. A 3-way merging example</h2>
+    Consider the three XML files shown below: a base file (<tt>b.xml</tt>
+)  and two parallell versions (branches), <tt>1.xml</tt> and <tt>2.xml</tt>
+,  obtained by editing <tt>b.xml</tt> in different ways. When performing
+a 3-way  merge of these files, we get a file that contains both the changes
+between  <tt> b.xml</tt> and <tt>1.xml</tt> as well as the changes between
+<tt>b.xml</tt>    and <tt>2.xml</tt>. The changes between <tt>b.xml</tt>
+and <tt>1.xml</tt>    are: <br>
+=20
+<ol>
+   <li><tt>&lt;R&gt;</tt> is updated to <tt>&lt;Rp&gt;</tt></li>
+   <li><tt>&lt;i&gt;</tt> has been inserted below <tt>&lt;m&gt;</tt></li>
+=20
+</ol>
+   The changes between <tt>b.xml</tt> and <tt>2.xml</tt> are:<br>
+=20
+<ol>
+   <li>The subtree rooted at <tt>&lt;a&gt;</tt> has been deleted, except
+for      <tt>&lt;m&gt;</tt> which is moved as the last child of <tt>&lt;R&g=
+t;</tt></li>
+   <li>The subtree rooted at <tt>&lt;c&gt;</tt> has been copied<br>
+   </li>
+=20
+</ol>
+ <br>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" width=3D"400" bgcol=
+or=3D"#ffff99">
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><b>1.xml</b><br>
+       </td>
+       <td valign=3D"Top"><b>b.xml</b><br>
+       </td>
+       <td valign=3D"Top"><b>2.xml</b><br>
+       </td>
+     </tr>
+     <tr>
+       <td valign=3D"Top"><tt>&lt;Rp&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;a&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;b/&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;m&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;i/&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/m&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;/a&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;c&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+    &lt;/Rp&gt;</tt><br>
+       </td>
+       <td valign=3D"Top"><tt>&lt;R&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;a&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;b/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;m/&gt;</tt><tt><br>
+         &nbsp;&nbsp;&nbsp; &lt;/a&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;</tt><tt><br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &lt;/R&gt;</tt></td>
+       <td valign=3D"Top"><tt>&lt;R&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;cc/&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;/c&gt;<br>
+         &nbsp;&nbsp;&nbsp; &lt;m/&gt;<br>
+         &lt;/R&gt;</tt><br>
+       </td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+ <br>
+   The 3-way merge is performed by running the command shown below. You can=
+=20
+ ignore the meaning of <tt>-c 0</tt> for now. <br>
+ <br>
+ <tt>3dm -c 0 --merge b.xml 1.xml 2.xml</tt><br>
+ <br>
+   The result is shown below. Note how the changes from both branches have
+ been integrated.<br>
+ <br>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" width=3D"400" bgcol=
+or=3D"#ffff99">
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><tt>&lt;?xml version=3D"1.0" encoding=3D"UTF-8"?&=
+gt;<br>
+   &lt;Rp&gt;<br>
+   &nbsp;&lt;c&gt;<br>
+   &nbsp; &lt;cc /&gt;<br>
+   &nbsp;&lt;/c&gt;<br>
+   &nbsp;&lt;c&gt;<br>
+   &nbsp; &lt;cc /&gt;<br>
+   &nbsp;&lt;/c&gt;<br>
+   &nbsp;&lt;m&gt;<br>
+   &nbsp; &lt;i /&gt;<br>
+   &nbsp;&lt;/m&gt;<br>
+   &lt;/Rp&gt;</tt><tt><br>
+       </tt></td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+ <br>
+   The merging algorithm is described in chapers 6-7 of the thesis.<br>
+=20
+<h2>4. Obtaining 3DM</h2>
+   Please go to the <a href=3D"http://tdm.berlios.de/">3dm home page</a>.
+   The Java source of &nbsp;3DM is released under the Lesser=20
+   Gnu Public License (LGPL).
+   To run 3dm, you will also need a SAX2 compilant XML parser (the default
+    parser is the <a href=3D"http://xml.apache.org/xerces-j/">Xerces parser=
+</a>
+    from the Apache project) and the GNU java-getopt package=20
+    (<a href=3D"http://www.urbanophile.com/arenn/hacking/download.html">
+    home page</a> , <a href=3D"https://www.cs.hut.fi/~ctl/3dm/java-getopt-1=
+.0.8.jar">local copy of java-getopt-1.0.8.jar</a>).=20
+
+   <p><small>Old (pre 0.1.0) versions are available=20
+   <a href=3D"https://www.cs.hut.fi/~ctl/3dm/3dm_src.tar.gz">here (3dm_src.=
+tar.gz)</a>
+   and <a href=3D"https://www.cs.hut.fi/~ctl/3dm/3dm_src.zip">here (3dm_src=
+.zip)</a>.=20
+   A pre-compiled pre-0.1.0 JAR file is also=20
+   <a href=3D"https://www.cs.hut.fi/~ctl/3dm/3dm.jar">available (3dm.jar)</=
+a></small>
+
+=20
+</p><h2>5. Running 3DM</h2>
+   Running 3DM is easy, just start java with Xerces, java-getopt and 3dm.ja=
+r=20
+ (or the directory of compiled classes) in the classpath and <tt>TreeDiffMe=
+rge</tt>
+    as main class. Below are shell scripts for Linux and Windows.<br>
+=20
+<h3>Linux 3dm<br>
+ </h3>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" width=3D"100%" bgco=
+lor=3D"#ffff99">
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><tt>#!/bin/sh<br>
+   # 3DM startup script<br>
+   JAVA=3D/usr/local/jbuilder4/jdk1.3/bin/java<br>
+   JARPATH=3D/home/ctl/ubidoc-support/lib<br>
+   COMPILEPATH=3D3dm.jar<br>
+   $JAVA -cp $JARPATH/java-getopt-1.0.8.jar:$JARPATH/xerces.jar:$COMPILEPAT=
+H=20
+TreeDiffMerge $*</tt><br>
+       </td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+=20
+<h3>Windows 3dm.bat<br>
+ </h3>
+=20
+<table cellpadding=3D"0" cellspacing=3D"0" border=3D"1" width=3D"100%" bgco=
+lor=3D"#ffff99">
+   <tbody>
+     <tr>
+       <td valign=3D"Top"><tt>@echo off<br>
+   rem 3DM startup script<br>
+ set JAVA=3Dc:\bin\jbuilder5\jdk1.3\bin\java<br>
+   set JARPATH=3Dc:\data\ubidoc-support\lib<br>
+   set COMPILEPATH=3D3dm.jar<br>
+   %JAVA% -cp %JARPATH%\java-getopt-1.0.8.jar;%JARPATH%/xerces.jar;%COMPILE=
+PATH%=20
+TreeDiffMerge %1 %2 %3 %4 %5 %6 %7</tt><br>
+       </td>
+     </tr>
+  =20
+  </tbody>=20
+</table>
+=20
+<h2>6. Visualizing the merge</h2>
+ 3DM can produce a "merge log" that lists the changes in the merged file
+compared to the base version. I've written a quick hack to visualize the
+merge log (<a href=3D"https://www.cs.hut.fi/~ctl/3dm/treediff_src.tar.gz">s=
+ources .tar.gz</a>
+, <a href=3D"https://www.cs.hut.fi/~ctl/3dm/treediff_src.zip">sources .zip<=
+/a>
+  and <a href=3D"https://www.cs.hut.fi/~ctl/3dm/treediff.jar">.jar</a>
+  file). The main class is <tt>TreeDiff</tt>, and it requires a SAX2 parser=
+=20
+in the classpath; the .jar file is compiled for Xerces.&nbsp; The figure be=
+low
+visualizes the merge log obtained by running the previously mentioned merge
+example.<br>
+ <br>
+ <img src=3D"https://www.cs.hut.fi/~ctl/3dm/44.png" alt=3D"TreeDiff screens=
+hot">
+ <br>
+=20
+<h2>7. Current Limitations</h2>
+ Being prototype code, some less crucial things are currently missing from=
+=20
+3DM:<br>
+=20
+<ol>
+   <li>DTD processing. 3DM simply assumes the DTD of the input files are
+identical</li>
+   <li>More intelligent processing of entities. Currently 3DM (or actually=
+=20
+the XML parser) expands all entities. A better alternative would be to merg=
+e=20
+entity declarations.</li>
+=20
+</ol>
+ See chapter 10 of the thesis for a more in-depth description of the limita=
+tions.<br>
+=20
+<h2>8. Further development</h2>
+There is a development website for 3DM at <a href=3D"http://developer.berli=
+os.de/project/?group_id=3D400">http://developer.berlios.de/project/?group_i=
+d=3D400</a>.
+This page is also available at <a href=3D"http://tdm.berlios.de/">http://td=
+m.berlios.de/</a>.=20
+
+<h2>9. Contact</h2>
+The author can be emailed at ctl theatsign cs dot hut dot fi.<p>
+
+</p><hr width=3D"100%" size=3D"1" noshade=3D"">=20
+<sup>1</sup>Postscript and PDF regenerated for better layout, no change to=
+=20
+contents since rev 1.108
+<hr width=3D"100%" size=3D"1" noshade=3D""><a href=3D"http://escati.linkopp=
+.net/counter2001/478521.shtml">*</a> <img src=3D"http://escati.linkopp.net/=
+cgi-bin/counter2001.cgi?478521" border=3D"0" hidden=3D"" style=3D"display: =
+none !important;"><i>$Id: index.html,v 1.8 2006/08/18 08:18:27 ctl Exp $</i=
+><br>
+ <br>
+=20
+
+
+</body></html>
+------MultipartBoundary--5ks6krb1iPqsSVOURlKXvJw2pPgRQOXxvWK07fY8wB----
+Content-Type: image/png
+Content-Transfer-Encoding: base64
+Content-Location: https://www.cs.hut.fi/~ctl/3dm/44.png
+
+iVBORw0KGgoAAAANSUhEUgAAAhYAAAEtCAIAAAGsd47hAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAA
+CXRFWHRDb21tZW50AACJKo0GAAAgAElEQVR4nO2dPagkRfeHJzQ03FQwUDBwwUDBRMFAwcAFAwUD
+EQNZDGQxkMVkuRjIxUAuBrIYCGsgrIHgGwi+iaCB4Bv84YamhhtuOP+e6Zma6vo49dFfp3ueh3OL
+7r7d9f3r09XVPb25/r+/12Gb5m+754mnbzf25DO3n3zuzpPP32m23Hjh7o0X7z718t5euXj2tb29
+fnnzzcubbzV29dLbVy+9c/XSe1evvnf/1ffvv/rh/Tc+erCzjx/c+qSxh7c+ffjuZw/f/fyXxj64
+98sHX/x2+8u9ffXbna//2Nk3f9z99u+73+3s4vvrix+uL368vmzsp38uf/7n6j+N/Xv167/3/7u3
+3x89+PPRg78enXK/2TT5bBYe/PW4U5LtkaYkNxpbXEnWYaeSNOXr/GOzsEIuLLuJklx9fTmqvfrK
+q2Mn0ajlpPiWVkPD0pRk8Dh9ZijJGEls/ZKMwTxtMgazlmTQDuCXZIwOtvY22ewZKo1dSUYReYdV
+t8ngnZhzVxm7kviNMGyzNCXx4xv87LWuNhk7jV2bdE9emxHOZbRJCdOVpLEmsTFGP020F/cuRorc
+tlNJmvTaMGjVCbSHt+WRrWcSp5KswNI6cXyLsCrvKUfbn1NJ2qhNGHOXyR38VXtnszxiSZZO52rF
+X3D3DvUlv32S8YzBStuk8w+x0wdrXVC/EP9Q7ba6NrHPSMnzktCG8m75Z/AKVtcmhxXRhwR38Df6
+Khp7JHeIc1VtMncehmFdJVmHbcxE6W7ut5349ed+X7k4zJi+fvnsm4cZ09106X7G9DBd+v79N9oZ
+048f3PrYmi797DhdamZMv2rsMF1659vjjOn31ozpT/80dtXOmP767/1frenS3Yzp4+v9sKQ5bZiB
+zW7VKUm7vJv7feGO2pK0ZXBLMnuvGMQ6JWkne+1wQbauNhl7YrZR3dgTv40dStI5K488Nhop/kBJ
+Fgol0cdsJRlcLWtvk9gAeEiGjnvtbTI2Y7T22ttk+HvPm+Fneh3W3iZLhJLo41CSUcdAbUptfY0R
+v5mO3Yw3MWtmZZ2FMeZ+Vzf6Nb0t5wa2s3HK+TeBQ0mKbsVvvYnF2BSXHMmwrO7clflEgDMfL+w/
+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
+gg==
+------MultipartBoundary--5ks6krb1iPqsSVOURlKXvJw2pPgRQOXxvWK07fY8wB------
